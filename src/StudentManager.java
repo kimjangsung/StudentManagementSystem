@@ -23,19 +23,49 @@ public class StudentManager {
 		System.out.print("Student ID:");
 		int studentId = input.nextInt();
 		if (student == null) {
-			System.out.println("the studnt has not been registered");
+			System.out.println("the student has not been registered");
 			return;
 		}
 		if (student.id == studentId) {
 			student = null;
-			System.out.println("the studnt is deleted");
+			System.out.println("the student is deleted");
 		}
 	}
 	public void editStudent() {
 		System.out.print("Student ID:");
 		int studentId = input.nextInt();
 		if (student.id == studentId) {
-			System.out.println("the studnt to be edited is" + studentId);
+			int num = -1;
+			while(num !=5) {
+				System.out.println("** Student Info Edit Menu **");
+				System.out.println("  1. Edit Id");
+				System.out.println("  2. Edit Name");
+				System.out.println("  3. Edit Email");
+				System.out.println("  4. Edit Phone");
+				System.out.println("  5. Exit");
+				System.out.println("Select one number between 1 - 5:");
+				num = input.nextInt();
+				if (num == 1) {
+					System.out.print("Student ID:");
+					student.id = input.nextInt();
+				}
+				else if (num == 2) {
+					System.out.print("Student name:");
+					student.name = input.next();
+				}
+				else if (num == 3) {
+					System.out.print("Email address:");
+					student.email = input.next();
+				}
+				else if (num == 4) {
+					System.out.print("Phone number:");
+					student.phone = input.next();
+				}
+				else {
+					continue;
+				}
+			}
+			System.out.println("the student to be edited is" + studentId);
 		}
 	}
 	public void viewStudent() {
