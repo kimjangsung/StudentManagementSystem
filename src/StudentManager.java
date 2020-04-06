@@ -65,14 +65,13 @@ public class StudentManager {
 					continue;
 				}
 			}
-			System.out.println("the student to be edited is" + studentId);
 		}
 	}
 	public void viewStudent() {
 		System.out.print("Student ID:");
 		int studentId = input.nextInt();
 		if (student.id == studentId) {
-			student.printInof();
+			student.printInfo();
 		}
 	}
 }

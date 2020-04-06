@@ -1,4 +1,3 @@
-
 public class Student {
 
 	String name;
@@ -20,7 +19,7 @@ public class Student {
 		this.phone = phone;
 
 	}
-	public void printInof() {
+	public void printInfo() {
 		System.out.println("name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
 	}
 }
