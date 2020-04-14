@@ -1,0 +1,36 @@
+import java.util.Scanner;
+
+public class MenuManager {
+
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		MoneyManager moneyManager = new MoneyManager(input);
+
+		int num = -1;
+		while(num !=5) {
+			System.out.println("*** Money Management System meny ***");
+			System.out.println("  1. Add Money");
+			System.out.println("  2. Delete Money");
+			System.out.println("  3. Edit Money");
+			System.out.println("  4. View Money");
+			System.out.println("  5. Exit");
+			System.out.println("Select one number between 1 - 5:");
+			num = input.nextInt();
+			if (num == 1) {
+				moneyManager.addmoney();
+			}
+			else if (num == 2) {
+				moneyManager.deletemoney();
+			}
+			else if (num == 3) {
+				moneyManager.editmoney();
+			}
+			else if (num == 4) {
+				moneyManager.viewmoneys();
+			}
+			else {
+				continue;
+			}
+		}
+	}
+}
