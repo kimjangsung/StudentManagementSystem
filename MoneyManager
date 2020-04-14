@@ -1,0 +1,90 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class MoneyManager {
+	ArrayList<Money> moneys = new ArrayList<Money>();
+	Scanner input;
+	MoneyManager(Scanner input){
+		this.input = input;
+	}
+
+	public void addmoney() {
+		Money money =new Money();
+		System.out.print("money ID:");
+		money.id = input.nextInt();
+		System.out.print("money name:");
+		money.name = input.next();
+		System.out.print("Email address:");
+		money.email = input.next();
+		System.out.print("Phone number:");
+		money.phone = input.next();
+		moneys.add(money);
+	}
+
+	public void deletemoney() {
+		System.out.print("money ID:");
+		int moneyId = input.nextInt();
+		int index = -1;
+		for (int i = 0; i<moneys.size(); i++) {
+			if (moneys.get(i).id == moneyId) {
+				index = i;
+				break;
+			}
+		}
+		if(index >= 0) {
+			moneys.remove(index);
+			System.out.println("the money" + moneyId +" is deleted");
+		}
+		else {
+			System.out.println("the money has not been registered");
+			return;
+		}
+	}
+	public void editmoney() {
+		System.out.print("money ID:");
+		int moneyId = input.nextInt();
+		for (int i = 0; i<moneys.size(); i++) {
+			Money money = moneys.get(i);
+			if (money.id == moneyId) {
+				int num = -1;
+				while(num !=5) {
+					System.out.println("** money Info Edit Menu **");
+					System.out.println("  1. Edit Id");
+					System.out.println("  2. Edit Name");
+					System.out.println("  3. Edit Email");
+					System.out.println("  4. Edit Phone");
+					System.out.println("  5. Exit");
+					System.out.println("Select one number between 1 - 5:");
+					num = input.nextInt();
+					if (num == 1) {
+						System.out.print("money ID:");
+						money.id = input.nextInt();
+					}
+					else if (num == 2) {
+						System.out.print("money name:");
+						money.name = input.next();
+					}
+					else if (num == 3) {
+						System.out.print("Email address:");
+						money.email = input.next();
+					}
+					else if (num == 4) {
+						System.out.print("Phone number:");
+						money.phone = input.next();
+					}
+					else {
+						continue;
+					} //if
+				}//while
+				break;
+			}//if
+		}//for
+	}
+	public void viewmoneys() {
+		//		System.out.print("money ID:");
+		//		int moneyId = input.nextInt();
+		for (int i = 0; i<moneys.size(); i++) {
+			moneys.get(i).printInfo();
+		}
+	}
+}
