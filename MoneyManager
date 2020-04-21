@@ -1,5 +1,10 @@
+package github;
+
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import money.HighSchoolMoney;
+import money.Money;
 
 public class MoneyManager {
 	ArrayList<Money> moneys = new ArrayList<Money>();
@@ -9,16 +14,30 @@ public class MoneyManager {
 	}
 
 	public void addmoney() {
-		Money money =new Money();
-		System.out.print("money ID:");
-		money.id = input.nextInt();
-		System.out.print("money name:");
-		money.name = input.next();
-		System.out.print("Email address:");
-		money.email = input.next();
-		System.out.print("Phone number:");
-		money.phone = input.next();
-		moneys.add(money);
+		int kind = 0;
+		Money money;
+		while(kind != 1 && kind != 2) {
+			System.out.print("1 for University");
+			System.out.print("2 for High School");
+			System.out.print("Select num for Money Kind between 1 and 2:");
+			kind = input.nextInt();
+			if (kind == 1) {
+				money =new Money();
+				money.getUserInput(input);
+				moneys.add(money);
+				break;
+			}
+			else if (kind ==2) {
+				money =new HighSchoolMoney();
+				money.getUserInput(input);
+				moneys.add(money);
+				break;
+
+			}
+			else {
+				System.out.print("Select num for Money Kind between 1 and 2:");
+			}
+		}
 	}
 
 	public void deletemoney() {
@@ -26,7 +45,7 @@ public class MoneyManager {
 		int moneyId = input.nextInt();
 		int index = -1;
 		for (int i = 0; i<moneys.size(); i++) {
-			if (moneys.get(i).id == moneyId) {
+			if (moneys.get(i).getId() == moneyId) {
 				index = i;
 				break;
 			}
@@ -45,7 +64,7 @@ public class MoneyManager {
 		int moneyId = input.nextInt();
 		for (int i = 0; i<moneys.size(); i++) {
 			Money money = moneys.get(i);
-			if (money.id == moneyId) {
+			if (money.getId() == moneyId) {
 				int num = -1;
 				while(num !=5) {
 					System.out.println("** money Info Edit Menu **");
@@ -58,19 +77,23 @@ public class MoneyManager {
 					num = input.nextInt();
 					if (num == 1) {
 						System.out.print("money ID:");
-						money.id = input.nextInt();
+						int id = input.nextInt();
+						money.setId(id);
 					}
 					else if (num == 2) {
 						System.out.print("money name:");
-						money.name = input.next();
+						String name = input.next();
+						money.setName(name);
 					}
 					else if (num == 3) {
 						System.out.print("Email address:");
-						money.email = input.next();
+						String email = input.next();
+						money.setEmail(email);
 					}
 					else if (num == 4) {
 						System.out.print("Phone number:");
-						money.phone = input.next();
+						String phone = input.next();
+						money.setPhone(phone);
 					}
 					else {
 						continue;
@@ -83,6 +106,7 @@ public class MoneyManager {
 	public void viewmoneys() {
 		//		System.out.print("money ID:");
 		//		int moneyId = input.nextInt();
+		System.out.println("# of registerd moneys:"+ moneys.size());
 		for (int i = 0; i<moneys.size(); i++) {
 			moneys.get(i).printInfo();
 		}
