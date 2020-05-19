@@ -1,106 +1,181 @@
+package exceptions;
+
+public class EmailFormatException extends Exception {
+
+}
+
+package github;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class MenuManager {
+
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		songManager songManager = new songManager(input);
+
+		selectMenu(input, songManager );
+	}
+
+	public static void selectMenu(Scanner input, songManager songManager) {
+		int num = -1;
+		while(num !=5) {
+			try {
+				showMenu();
+				num = input.nextInt();
+				switch(num) {
+				case 1:
+					songManager.addsong();
+					break;
+				case 2:
+					songManager.deletesong();
+					break;
+				case 3:
+					songManager.editsong();
+					break;
+				case 4:
+					songManager.viewsongs();
+					break;
+				default:
+					continue;
+				}
+			}
+			catch(InputMismatchException e) {
+				System.out.println("please put an integer between 1 and 5!");
+				if(input.hasNext()) {
+					input.next();
+				}
+				num = -1;
+			}
+		}
+	}
+	public static void showMenu() {
+		System.out.println("*** song Management System meny ***");
+		System.out.println("  1. Add song");
+		System.out.println("  2. Delete song");
+		System.out.println("  3. Edit song");
+		System.out.println("  4. View song");
+		System.out.println("  5. Exit");
+		System.out.println("Select one number between 1 - 5:");
+
+	}
+}
+
+
 package github;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import money.ElementarySchoolMoney;
-import money.HighSchoolMoney;
-import money.Money;
-import money.MoneyInput;
-import money.MoneyKind;
-import money.UniversityMoney;
+import song.balladesong;
+import song.dancesong;
+import song.song;
+import song.songInput;
+import song.songKind;
+import song.hiphopsong;
 
-public class MoneyManager {
-	ArrayList<MoneyInput> moneys = new ArrayList<MoneyInput>();
+public class songManager {
+	ArrayList<songInput> songs = new ArrayList<songInput>();
 	Scanner input;
-	MoneyManager(Scanner input){
+	songManager(Scanner input){
 		this.input = input;
 	}
 
-	public void addmoney() {
+	public void addsong() {
 		int kind = 0;
-		MoneyInput moneyInput;
-		while(kind != 1 && kind != 2) {
-			System.out.println("1 for University");
-			System.out.println("2 for High School");
-			System.out.println("3 for Elementary School");
-			System.out.print("Select num 1, 2, or 3for Money Kind : ");
-			kind = input.nextInt();
-			if (kind == 1) {
-				moneyInput =new UniversityMoney(MoneyKind.University);
-				moneyInput.getUserInput(input);
-				moneys.add(moneyInput);
-				break;
-			}
-			else if (kind ==2) {
-				moneyInput =new HighSchoolMoney(MoneyKind.HighSchool);
-				moneyInput.getUserInput(input);
-				moneys.add(moneyInput);
-				break;
+		songInput songInput;
+		while(kind < 1 || kind > 3) {
+			try {
+				System.out.println("1 for hiphop");
+				System.out.println("2 for dance");
+				System.out.println("3 for ballade");
+				System.out.println("Select num 1, 2, or 3 for song Kind : ");
+				kind = input.nextInt();
+				if (kind == 1) {
+					songInput =new hiphopsong(songKind.hiphop);
+					songInput.getUserInput(input);
+					songs.add(songInput);
+					break;
+				}
+				else if (kind ==2) {
+					songInput =new dancesong(songKind.dance);
+					songInput.getUserInput(input);
+					songs.add(songInput);
+					break;
 
-			}
-			else if (kind ==3) {
-				moneyInput =new ElementarySchoolMoney(MoneyKind.ElementarySchool);
-				moneyInput.getUserInput(input);
-				moneys.add(moneyInput);
-				break;
+				}
+				else if (kind ==3) {
+					songInput =new balladesong(songKind.ballade);
+					songInput.getUserInput(input);
+					songs.add(songInput);
+					break;
 
+				}
+				else {
+					System.out.print("Select num for song Kind between 1 and 2:");
+				}
 			}
-			else {
-				System.out.print("Select num for Money Kind between 1 and 2:");
+			catch(InputMismatchException e) {
+				System.out.println("please put an integer between 1 and 3!");
+				if(input.hasNext()) {
+					input.next();
+				}
+				kind = -1;
 			}
 		}
 	}
 
-	public void deletemoney() {
-		System.out.print("money ID:");
-		int moneyId = input.nextInt();
-		int index = findIndex(moneyId);
-		removefromMoneys(index, moneyId);
+	public void deletesong() {
+		System.out.print("song ID:");
+		int songId = input.nextInt();
+		int index = findIndex(songId);
+		removefromsongs(index, songId);
 	}
-	public int findIndex(int moneyId) {
+	public int findIndex(int songId) {
 		int index = -1;
-		for (int i = 0; i<moneys.size(); i++) {
-			if (moneys.get(i).getId() == moneyId) {
+		for (int i = 0; i<songs.size(); i++) {
+			if (songs.get(i).getId() == songId) {
 				index = i;
 				break;
 			}
 		}
 		return index;
 	}
-	public int removefromMoneys(int index, int moneyId) {
+	public int removefromsongs(int index, int songId) {
 		if(index >= 0) {
-			moneys.remove(index);
-			System.out.println("the money" + moneyId +" is deleted");
+			songs.remove(index);
+			System.out.println("the song" + songId +" is deleted");
 			return 1;
 		}
 		else {
-			System.out.println("the money has not been registered");
+			System.out.println("the song has not been registered");
 			return -1;
 		}
 	}
-	public void editmoney() {
-		System.out.print("money ID:");
-		int moneyId = input.nextInt();
-		for (int i = 0; i<moneys.size(); i++) {
-			MoneyInput money = moneys.get(i);
-			if (money.getId() == moneyId) {
+	public void editsong() {
+		System.out.print("song ID:");
+		int songId = input.nextInt();
+		for (int i = 0; i<songs.size(); i++) {
+			songInput song = songs.get(i);
+			if (song.getId() == songId) {
 				int num = -1;
 				while(num !=5) {
 					showEditMenu();
 					num = input.nextInt();
 					switch(num) {
 					case 1:
-						money.setMoneyID(input);
+						song.setsongID(input);
 						break;
 					case 2:
-						money.setMoneyName(input);
+						song.setsongName(input);
 						break;
 					case 3:
-						money.setMoneyEmail(input);
+						song.setsongEmail(input);
 						break;
 					case 4:
-						money.setMoneyPhone(input);
+						song.setsongPhone(input);
 						break;
 					default:
 						continue;
@@ -110,16 +185,16 @@ public class MoneyManager {
 			}//if
 		}//for
 	}
-	public void viewmoneys() {
-		System.out.println("# of registerd moneys:"+ moneys.size());
-		for (int i = 0; i<moneys.size(); i++) {
-			moneys.get(i).printInfo();
+	public void viewsongs() {
+		System.out.println("# of registerd songs:"+ songs.size());
+		for (int i = 0; i<songs.size(); i++) {
+			songs.get(i).printInfo();
 		}
 	}
 
 
 	public void showEditMenu() {
-		System.out.println("** money Info Edit Menu **");
+		System.out.println("** song Info Edit Menu **");
 		System.out.println("  1. Edit Id");
 		System.out.println("  2. Edit Name");
 		System.out.println("  3. Edit Email");
@@ -130,44 +205,197 @@ public class MoneyManager {
 }
 
 
-package money;
+package song;
 
 import java.util.Scanner;
 
-public abstract class Money implements MoneyInput{
-	protected MoneyKind kind = MoneyKind.University;
+import exceptions.EmailFormatException;
+
+public class balladesong extends popularsong{
+
+	protected String parentemail;
+	protected String parentphone;
+
+	public balladesong(songKind kind) {
+		super(kind);
+	}
+
+	public void getUserInput(Scanner input) {
+		setsongID(input);
+		setsongName(input);
+		setsongEmailwithYN(input);
+		setParentEmailwithYN(input);
+		setsongPhone(input);
+	}
+	public void setParentEmailwithYN(Scanner input) {
+		char answer = 'x';
+		while (answer != 'y' && answer != 'Y' && answer != 'n' &&answer != 'N')
+		{
+			System.out.print("Do you have a parent's email address? (Y/N)");
+			answer = input.next().charAt(0);
+			try {
+				if(answer == 'y' || answer =='Y') {
+					setsongEmail(input);
+					break;
+				}
+				else if(answer == 'n' || answer =='N') {
+					this.setEmail("");
+					break;
+				}
+				else {
+				}
+			}
+			catch(EmailFormatException e) {
+				System.out.println("Incorrect Email Format, put the e-mail address that contains @");
+			}
+		}
+	}
+
+	public void printInfo() {
+		String skind = getKindString();
+		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone + "parent's email :" + email + "parent's phone : " + phone);
+	}
+
+}
+
+
+package song;
+
+import java.util.Scanner;
+
+public class hiphopsong extends song{
+	
+	public hiphopsong(songKind kind) {
+		super(kind);
+	}
+	
+	public void getUserInput(Scanner input) {
+		setsongID(input);
+		setsongName(input);
+		setsongEmail(input);
+		setsongPhone(input);
+	}
+	
+	public void printInfo() {
+		String skind = getKindString();
+		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
+	}
+}
+
+
+package song;
+
+import java.util.Scanner;
+
+public class hiphopsong extends song{
+	
+	public hiphopsong(songKind kind) {
+		super(kind);
+	}
+	
+	public void getUserInput(Scanner input) {
+		setsongID(input);
+		setsongName(input);
+		setsongEmail(input);
+		setsongPhone(input);
+	}
+	
+	public void printInfo() {
+		String skind = getKindString();
+		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
+	}
+}
+
+
+package song;
+
+import java.util.Scanner;
+
+import exceptions.EmailFormatException;
+
+public abstract class popularsong extends song {
+
+	public popularsong(songKind kind) {
+		super(kind);
+	}
+
+	@Override
+	public abstract void getUserInput(Scanner input);
+
+	@Override
+	public void printInfo() {
+		String skind = getKindString();
+		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
+	}
+
+	public void setsongEmailwithYN(Scanner input) {
+		char answer = 'x';
+		while (answer != 'y' && answer != 'Y' && answer != 'n' &&answer != 'N')
+		{
+			System.out.print("Do you have an email address? (Y/N)");
+			answer = input.next().charAt(0);
+			try {
+			if(answer == 'y' || answer =='Y') {
+				System.out.print("Email address:");
+				String email = input.next();
+				this.setEmail(email);
+				break;
+			}
+			else if(answer == 'n' || answer =='N') {
+				this.setEmail("");
+				break;
+			}
+			else {
+			}
+			}
+			catch(EmailFormatException e) {
+				System.out.println("Incorrect Email Format, put the e-mail address that contains @");
+			}
+		}
+	}
+}
+
+
+package song;
+
+import java.util.Scanner;
+
+import exceptions.EmailFormatException;
+
+public abstract class song implements songInput{
+	protected songKind kind = songKind.hiphop;
 	protected String name;
 	protected int id;
 	protected String email;
 	protected String phone;
 
-	public Money() {
+	public song() {
 	}
-	public Money(MoneyKind kind) {
+	public song(songKind kind) {
 		this.kind = kind;
 	}
-	public Money(String name, int id) {
+	public song(String name, int id) {
 		this.name = name;
 		this.id = id;
 	}
 
-	public Money(String name, int id, String email, String phone) {
+	public song(String name, int id, String email, String phone) {
 		this.name = name;
 		this.id = id;
 		this.email = email;
 		this.phone = phone;
 	}
-	public Money(MoneyKind kind, String name, int id, String email, String phone) {
+	public song(songKind kind, String name, int id, String email, String phone) {
 		this.kind = kind;
 		this.name = name;
 		this.id = id;
 		this.email = email;
 		this.phone = phone;
 	}
-	public MoneyKind getKind() {
+	public songKind getKind() {
 		return kind;
 	}
-	public void setKind(MoneyKind kind) {
+	public void setKind(songKind kind) {
 		this.kind = kind;
 	}
 	public String getName() {
@@ -185,7 +413,10 @@ public abstract class Money implements MoneyInput{
 	public String getEmail() {
 		return email;
 	}
-	public void setEmail(String email) {
+	public void setEmail(String email) throws EmailFormatException {
+		if(!email.contains("@") && !email.equals("")) {
+			throw new EmailFormatException();
+		}
 		this.email = email;
 	}
 	public String getPhone() {
@@ -194,25 +425,32 @@ public abstract class Money implements MoneyInput{
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	
+
 	public abstract void printInfo();
-	
-	public void setMoneyID(Scanner input) {
-		System.out.print("money ID:");
+
+	public void setsongID(Scanner input) {
+		System.out.print("song ID:");
 		int id = input.nextInt();
 		this.setId(id);
 	}
-	public void setMoneyName(Scanner input) {
-		System.out.print("money name:");
+	public void setsongName(Scanner input) {
+		System.out.print("song name:");
 		String name = input.next();
 		this.setName(name);
 	}
-	public void setMoneyEmail(Scanner input) {
-		System.out.print("Email address:");
-		String email = input.next();
-		this.setEmail(email);
+	public void setsongEmail(Scanner input) {
+		String email = "";
+		while (!email.contains("@")) {
+			System.out.print("Email address:");
+			email = input.next();
+			try {
+				this.setEmail(email);
+			} catch (EmailFormatException e) {
+				System.out.println("Incorrect Email Format, put the e-mail address that contains @");
+			}
+		}
 	}
-	public void setMoneyPhone(Scanner input) {
+	public void setsongPhone(Scanner input) {
 		System.out.print("Phone number:");
 		String phone = input.next();
 		this.setPhone(phone);
@@ -220,21 +458,48 @@ public abstract class Money implements MoneyInput{
 	public String getKindString() {
 		String skind = "none";
 		switch(this.kind) {
-		case University :
+		case hiphop :
 			skind = "Univ.";
 			break;
-		case HighSchool : 
+		case dance : 
 			skind = "High.";
 			break;
-		case MiddleSchool :
-			skind = "Middle.";
-			break;
-		case ElementarySchool :
+		case ballade :
 			skind = "Elementary.";
 			break;
-			default:		
+		default:		
 		}
 		return skind;
 	}
 }
 
+
+package song;
+
+import java.util.Scanner;
+
+import exceptions.EmailFormatException;
+
+public interface songInput {
+
+	public int getId();
+	public void setId(int id);
+	public void setName(String name);
+	public void setEmail(String email) throws EmailFormatException;
+	public void setPhone(String phone);
+	public void getUserInput(Scanner input);
+	public void printInfo();
+	public void setsongID(Scanner input);
+	public void setsongName(Scanner input);
+	public void setsongEmail(Scanner input);
+	public void setsongPhone(Scanner input);
+}
+
+
+package song;
+
+public enum songKind {
+	hiphop,
+	dance,
+	ballade,
+}
