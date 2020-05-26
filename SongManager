@@ -6,19 +6,35 @@ public class EmailFormatException extends Exception {
 
 package github;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import log.EventLogger;
 
 public class MenuManager {
-
+	
+	static EventLogger logger = new EventLogger("log.txt");
+	
 	public static void main(String[] args) {
+		
 		Scanner input = new Scanner(System.in);
-		songManager songManager = new songManager(input);
-
+		SongManager songManager = getObject("songmanager.ser");
+		if (songManager == null) {
+			songManager = new SongManager(input);
+		}
+		else {
+			songManager.setScanner(input);
+		}
 		selectMenu(input, songManager );
+		putObject(songManager, "songmanager.ser");
 	}
 
-	public static void selectMenu(Scanner input, songManager songManager) {
+	public static void selectMenu(Scanner input, SongManager songManager) {
 		int num = -1;
 		while(num !=5) {
 			try {
@@ -27,15 +43,19 @@ public class MenuManager {
 				switch(num) {
 				case 1:
 					songManager.addsong();
+					logger.log("add a song");
 					break;
 				case 2:
 					songManager.deletesong();
+					logger.log("delete a song");
 					break;
 				case 3:
 					songManager.editsong();
+					logger.log("edit a song");
 					break;
 				case 4:
 					songManager.viewsongs();
+					logger.log("view a list of songs");
 					break;
 				default:
 					continue;
@@ -51,70 +71,111 @@ public class MenuManager {
 		}
 	}
 	public static void showMenu() {
-		System.out.println("*** song Management System meny ***");
-		System.out.println("  1. Add song");
-		System.out.println("  2. Delete song");
-		System.out.println("  3. Edit song");
-		System.out.println("  4. View song");
+		System.out.println("*** Song Management System meny ***");
+		System.out.println("  1. Add Song");
+		System.out.println("  2. Delete Song");
+		System.out.println("  3. Edit Song");
+		System.out.println("  4. View Song");
 		System.out.println("  5. Exit");
 		System.out.println("Select one number between 1 - 5:");
+	}
+	public static SongManager getObject(String filename) {
+		SongManager songManager = null;
+		try {
+			FileInputStream file = new FileInputStream(filename);
+			ObjectInputStream in = new ObjectInputStream(file);
+			songManager = (SongManager) in.readObject();
+			in.close();
+			file.close();
+		} catch (FileNotFoundException e) {
+			return songManager;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return songManager;
+	}
+	public static void putObject(SongManager songManager, String filename) {
 
+		try {
+			FileOutputStream file = new FileOutputStream(filename);
+			ObjectOutputStream out = new ObjectOutputStream(file);
+			out.writeObject(songManager);
+			out.close();
+			file.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
 
-
 package github;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import song.balladesong;
-import song.dancesong;
-import song.song;
-import song.songInput;
-import song.songKind;
-import song.hiphopsong;
+import song.ElementarySchoolSong;
+import song.HighSchoolSong;
+import song.SongInput;
+import song.SongKind;
+import song.UniversitySong;
 
-public class songManager {
-	ArrayList<songInput> songs = new ArrayList<songInput>();
-	Scanner input;
-	songManager(Scanner input){
+public class SongManager implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2684755737374697795L;
+	ArrayList<SongInput> songs = new ArrayList<SongInput>();
+	transient Scanner input;
+	SongManager(Scanner input){
 		this.input = input;
 	}
-
+	
+	public void setScanner(Scanner input) {
+		this.input = input;
+	}
+	
 	public void addsong() {
 		int kind = 0;
-		songInput songInput;
+		SongInput songInput;
 		while(kind < 1 || kind > 3) {
 			try {
-				System.out.println("1 for hiphop");
-				System.out.println("2 for dance");
-				System.out.println("3 for ballade");
-				System.out.println("Select num 1, 2, or 3 for song Kind : ");
+				System.out.println("1 for University");
+				System.out.println("2 for High School");
+				System.out.println("3 for Elementary School");
+				System.out.println("Select num 1, 2, or 3 for Song Kind : ");
 				kind = input.nextInt();
 				if (kind == 1) {
-					songInput =new hiphopsong(songKind.hiphop);
+					songInput =new UniversitySong(SongKind.University);
 					songInput.getUserInput(input);
 					songs.add(songInput);
 					break;
 				}
 				else if (kind ==2) {
-					songInput =new dancesong(songKind.dance);
+					songInput =new HighSchoolSong(SongKind.HighSchool);
 					songInput.getUserInput(input);
 					songs.add(songInput);
 					break;
 
 				}
 				else if (kind ==3) {
-					songInput =new balladesong(songKind.ballade);
+					songInput =new ElementarySchoolSong(SongKind.ElementarySchool);
 					songInput.getUserInput(input);
 					songs.add(songInput);
 					break;
 
 				}
 				else {
-					System.out.print("Select num for song Kind between 1 and 2:");
+					System.out.print("Select num for Song Kind between 1 and 2:");
 				}
 			}
 			catch(InputMismatchException e) {
@@ -131,7 +192,7 @@ public class songManager {
 		System.out.print("song ID:");
 		int songId = input.nextInt();
 		int index = findIndex(songId);
-		removefromsongs(index, songId);
+		removefromSongs(index, songId);
 	}
 	public int findIndex(int songId) {
 		int index = -1;
@@ -143,7 +204,7 @@ public class songManager {
 		}
 		return index;
 	}
-	public int removefromsongs(int index, int songId) {
+	public int removefromSongs(int index, int songId) {
 		if(index >= 0) {
 			songs.remove(index);
 			System.out.println("the song" + songId +" is deleted");
@@ -158,7 +219,7 @@ public class songManager {
 		System.out.print("song ID:");
 		int songId = input.nextInt();
 		for (int i = 0; i<songs.size(); i++) {
-			songInput song = songs.get(i);
+			SongInput song = songs.get(i);
 			if (song.getId() == songId) {
 				int num = -1;
 				while(num !=5) {
@@ -166,16 +227,16 @@ public class songManager {
 					num = input.nextInt();
 					switch(num) {
 					case 1:
-						song.setsongID(input);
+						song.setSongID(input);
 						break;
 					case 2:
-						song.setsongName(input);
+						song.setSongName(input);
 						break;
 					case 3:
-						song.setsongEmail(input);
+						song.setSongEmail(input);
 						break;
 					case 4:
-						song.setsongPhone(input);
+						song.setSongPhone(input);
 						break;
 					default:
 						continue;
@@ -204,6 +265,46 @@ public class songManager {
 	}
 }
 
+package log;
+
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+public class EventLogger {
+	FileHandler filehandler;
+	LogManager logmanager;
+	Logger logger;
+
+	public EventLogger(String fileName){
+		try {
+			logmanager = LogManager.getLogManager();
+			logger = logmanager.getLogger(Logger.GLOBAL_LOGGER_NAME);
+			filehandler = new FileHandler(fileName);
+			filehandler.setFormatter(new SimpleFormatter());
+			logger.addHandler(filehandler);
+		}
+		catch (IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void log(String logMessage) {
+		logger.info(logMessage);
+	}
+}
+
+package log;
+
+public class LoggerTester {
+
+	public static void main(String[] args) {
+		EventLogger logger = new EventLogger("log.txt");
+		logger.log("test");
+	}
+}
 
 package song;
 
@@ -211,21 +312,21 @@ import java.util.Scanner;
 
 import exceptions.EmailFormatException;
 
-public class balladesong extends popularsong{
+public class ElementarySchoolSong extends TeenageSong{
 
 	protected String parentemail;
 	protected String parentphone;
 
-	public balladesong(songKind kind) {
+	public ElementarySchoolSong(SongKind kind) {
 		super(kind);
 	}
 
 	public void getUserInput(Scanner input) {
-		setsongID(input);
-		setsongName(input);
-		setsongEmailwithYN(input);
+		setSongID(input);
+		setSongName(input);
+		setSongEmailwithYN(input);
 		setParentEmailwithYN(input);
-		setsongPhone(input);
+		setSongPhone(input);
 	}
 	public void setParentEmailwithYN(Scanner input) {
 		char answer = 'x';
@@ -235,7 +336,7 @@ public class balladesong extends popularsong{
 			answer = input.next().charAt(0);
 			try {
 				if(answer == 'y' || answer =='Y') {
-					setsongEmail(input);
+					setSongEmail(input);
 					break;
 				}
 				else if(answer == 'n' || answer =='N') {
@@ -258,144 +359,69 @@ public class balladesong extends popularsong{
 
 }
 
-
 package song;
 
 import java.util.Scanner;
 
-public class hiphopsong extends song{
+public class HighSchoolSong extends TeenageSong{
 	
-	public hiphopsong(songKind kind) {
+	public HighSchoolSong(SongKind kind) {
 		super(kind);
 	}
 	
 	public void getUserInput(Scanner input) {
-		setsongID(input);
-		setsongName(input);
-		setsongEmail(input);
-		setsongPhone(input);
-	}
-	
-	public void printInfo() {
-		String skind = getKindString();
-		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
+		setSongID(input);
+		setSongName(input);
+		setSongEmailwithYN(input);
+		setSongPhone(input);
 	}
 }
 
-
 package song;
 
-import java.util.Scanner;
-
-public class hiphopsong extends song{
-	
-	public hiphopsong(songKind kind) {
-		super(kind);
-	}
-	
-	public void getUserInput(Scanner input) {
-		setsongID(input);
-		setsongName(input);
-		setsongEmail(input);
-		setsongPhone(input);
-	}
-	
-	public void printInfo() {
-		String skind = getKindString();
-		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
-	}
-}
-
-
-package song;
-
+import java.io.Serializable;
 import java.util.Scanner;
 
 import exceptions.EmailFormatException;
 
-public abstract class popularsong extends song {
-
-	public popularsong(songKind kind) {
-		super(kind);
-	}
-
-	@Override
-	public abstract void getUserInput(Scanner input);
-
-	@Override
-	public void printInfo() {
-		String skind = getKindString();
-		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
-	}
-
-	public void setsongEmailwithYN(Scanner input) {
-		char answer = 'x';
-		while (answer != 'y' && answer != 'Y' && answer != 'n' &&answer != 'N')
-		{
-			System.out.print("Do you have an email address? (Y/N)");
-			answer = input.next().charAt(0);
-			try {
-			if(answer == 'y' || answer =='Y') {
-				System.out.print("Email address:");
-				String email = input.next();
-				this.setEmail(email);
-				break;
-			}
-			else if(answer == 'n' || answer =='N') {
-				this.setEmail("");
-				break;
-			}
-			else {
-			}
-			}
-			catch(EmailFormatException e) {
-				System.out.println("Incorrect Email Format, put the e-mail address that contains @");
-			}
-		}
-	}
-}
-
-
-package song;
-
-import java.util.Scanner;
-
-import exceptions.EmailFormatException;
-
-public abstract class song implements songInput{
-	protected songKind kind = songKind.hiphop;
+public abstract class Song implements SongInput, Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8574706114587752217L;
+	protected SongKind kind = SongKind.University;
 	protected String name;
 	protected int id;
 	protected String email;
 	protected String phone;
 
-	public song() {
+	public Song() {
 	}
-	public song(songKind kind) {
+	public Song(SongKind kind) {
 		this.kind = kind;
 	}
-	public song(String name, int id) {
+	public Song(String name, int id) {
 		this.name = name;
 		this.id = id;
 	}
 
-	public song(String name, int id, String email, String phone) {
+	public Song(String name, int id, String email, String phone) {
 		this.name = name;
 		this.id = id;
 		this.email = email;
 		this.phone = phone;
 	}
-	public song(songKind kind, String name, int id, String email, String phone) {
+	public Song(SongKind kind, String name, int id, String email, String phone) {
 		this.kind = kind;
 		this.name = name;
 		this.id = id;
 		this.email = email;
 		this.phone = phone;
 	}
-	public songKind getKind() {
+	public SongKind getKind() {
 		return kind;
 	}
-	public void setKind(songKind kind) {
+	public void setKind(SongKind kind) {
 		this.kind = kind;
 	}
 	public String getName() {
@@ -428,17 +454,17 @@ public abstract class song implements songInput{
 
 	public abstract void printInfo();
 
-	public void setsongID(Scanner input) {
+	public void setSongID(Scanner input) {
 		System.out.print("song ID:");
 		int id = input.nextInt();
 		this.setId(id);
 	}
-	public void setsongName(Scanner input) {
+	public void setSongName(Scanner input) {
 		System.out.print("song name:");
 		String name = input.next();
 		this.setName(name);
 	}
-	public void setsongEmail(Scanner input) {
+	public void setSongEmail(Scanner input) {
 		String email = "";
 		while (!email.contains("@")) {
 			System.out.print("Email address:");
@@ -450,7 +476,7 @@ public abstract class song implements songInput{
 			}
 		}
 	}
-	public void setsongPhone(Scanner input) {
+	public void setSongPhone(Scanner input) {
 		System.out.print("Phone number:");
 		String phone = input.next();
 		this.setPhone(phone);
@@ -458,19 +484,53 @@ public abstract class song implements songInput{
 	public String getKindString() {
 		String skind = "none";
 		switch(this.kind) {
-		case hiphop :
+		case University :
 			skind = "Univ.";
 			break;
-		case dance : 
+		case HighSchool : 
 			skind = "High.";
 			break;
-		case ballade :
+		case MiddleSchool :
+			skind = "Middle.";
+			break;
+		case ElementarySchool :
 			skind = "Elementary.";
 			break;
 		default:		
 		}
 		return skind;
 	}
+}
+
+package song;
+
+import java.util.Scanner;
+
+import exceptions.EmailFormatException;
+
+public interface SongInput {
+
+	public int getId();
+	public void setId(int id);
+	public void setName(String name);
+	public void setEmail(String email) throws EmailFormatException;
+	public void setPhone(String phone);
+	public void getUserInput(Scanner input);
+	public void printInfo();
+	public void setSongID(Scanner input);
+	public void setSongName(Scanner input);
+	public void setSongEmail(Scanner input);
+	public void setSongPhone(Scanner input);
+}
+
+
+package song;
+
+public enum SongKind {
+	University,
+	HighSchool,
+	MiddleSchool,
+	ElementarySchool,
 }
 
 
@@ -480,26 +540,67 @@ import java.util.Scanner;
 
 import exceptions.EmailFormatException;
 
-public interface songInput {
+public abstract class TeenageSong extends Song {
 
-	public int getId();
-	public void setId(int id);
-	public void setName(String name);
-	public void setEmail(String email) throws EmailFormatException;
-	public void setPhone(String phone);
-	public void getUserInput(Scanner input);
-	public void printInfo();
-	public void setsongID(Scanner input);
-	public void setsongName(Scanner input);
-	public void setsongEmail(Scanner input);
-	public void setsongPhone(Scanner input);
+	public TeenageSong(SongKind kind) {
+		super(kind);
+	}
+
+	@Override
+	public abstract void getUserInput(Scanner input);
+
+	@Override
+	public void printInfo() {
+		String skind = getKindString();
+		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
+	}
+
+	public void setSongEmailwithYN(Scanner input) {
+		char answer = 'x';
+		while (answer != 'y' && answer != 'Y' && answer != 'n' &&answer != 'N')
+		{
+			System.out.print("Do you have an email address? (Y/N)");
+			answer = input.next().charAt(0);
+			try {
+			if(answer == 'y' || answer =='Y') {
+				System.out.print("Email address:");
+				String email = input.next();
+				this.setEmail(email);
+				break;
+			}
+			else if(answer == 'n' || answer =='N') {
+				this.setEmail("");
+				break;
+			}
+			else {
+			}
+			}
+			catch(EmailFormatException e) {
+				System.out.println("Incorrect Email Format, put the e-mail address that contains @");
+			}
+		}
+	}
 }
-
 
 package song;
 
-public enum songKind {
-	hiphop,
-	dance,
-	ballade,
+import java.util.Scanner;
+
+public class UniversitySong extends Song{
+	
+	public UniversitySong(SongKind kind) {
+		super(kind);
+	}
+	
+	public void getUserInput(Scanner input) {
+		setSongID(input);
+		setSongName(input);
+		setSongEmail(input);
+		setSongPhone(input);
+	}
+	
+	public void printInfo() {
+		String skind = getKindString();
+		System.out.println("kind : "+skind+" name : " + name + "id : " + id + "email : " + email + "phone : " + phone);
+	}
 }
