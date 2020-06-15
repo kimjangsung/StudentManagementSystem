@@ -10,6 +10,7 @@ import song.BalladeSong;
 import song.SongInput;
 import song.SongKind;
 import song.HiphopSong;
+import song.Song;
 
 public class SongManager implements Serializable{
 	/**
@@ -136,6 +137,16 @@ public class SongManager implements Serializable{
 	}
 
 
+	public int size() {
+		return songs.size();
+	}
+
+	public SongInput get(int index) {
+		return (Song) songs.get(index);
+		
+	}
+	
+	
 	public void showEditMenu() {
 		System.out.println("** song Info Edit Menu **");
 		System.out.println("  1. Edit Name");

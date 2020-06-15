@@ -1,45 +1,54 @@
 package gui;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+
+import github.SongManager;
 
 public class WindowFrame extends JFrame {
-	MenuSelection menuselection;
+
+	SongManager songManager;
+	MenuSelection menuSelection;
 	SongAdder songadder;
 	SongViewer songviewer;
 	
-	public WindowFrame() {
-		this.menuselection = new MenuSelection(this);
-		this.songadder = new SongAdder(this);
-		this.songviewer = new SongViewer(this);
-		
+	public WindowFrame(SongManager songManager) {
 		this.setSize(500, 300);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setupPanel(menuselection);
+		this.setTitle("My Frame");
+		
+		this.songManager = songManager;
+		menuSelection = new MenuSelection(this);
+		songadder = new SongAdder(this);
+		songviewer = new SongViewer(this, this.songManager);
+
+		
+		this.add(menuSelection);
+		
 		this.setVisible(true);
 	}
-	public void setupPanel(JPanel panel) {
-		this.getContentPane().removeAll();
-		this.getContentPane().add(panel);
-		this.revalidate();
-		this.repaint();
+	
+	public MenuSelection getMenuSelection() {
+		return menuSelection;
 	}
-	public MenuSelection getMenuselection() {
-		return menuselection;
+
+	public void setMenuSelection(MenuSelection menuSelection) {
+		this.menuSelection = menuSelection;
 	}
-	public void setMenuselection(MenuSelection menuselection) {
-		this.menuselection = menuselection;
-	}
+
 	public SongAdder getSongadder() {
 		return songadder;
 	}
+
 	public void setSongadder(SongAdder songadder) {
 		this.songadder = songadder;
 	}
+
 	public SongViewer getSongviewer() {
 		return songviewer;
 	}
+
 	public void setSongviewer(SongViewer songviewer) {
 		this.songviewer = songviewer;
 	}
+
 }
